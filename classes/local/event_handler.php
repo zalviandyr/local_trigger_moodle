@@ -4,6 +4,7 @@ namespace local_trigger_moodle\local;
 use core\event\user_enrolment_created;
 use core\notification;
 use curl;
+use cache;
 
 class event_handler {
     public static function user_enrolment_created(user_enrolment_created $event): void {
@@ -26,6 +27,10 @@ class event_handler {
             'user_id' => $userid,
             'course_id' => $courseid,
         ]), $options);
+
+        // purge cache
+        cache::make('core', 'completion')->purge();
+        cache::make('core', 'coursecompletion')->purge();
 
         notification::add("Enroll Trigger, userid: $userid, relateduserid: $relateduserid , courseid: $courseid");
         notification::add("Hit API: $api");
